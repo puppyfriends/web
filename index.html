@@ -275,7 +275,8 @@
     <section class="service_section layout_padding">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-6 offset-md-2">
+                <div class="col-md-6 offset-md-2 text-center">
+
                     <h2 class="custom_heading">
                         Realiza tu <span><strong>Apartado</strong></span>
                     </h2>
@@ -323,7 +324,7 @@
                         </div>
                     </div>
                     <div style="text-align: center;">
-                        <h5>Realiza tu apartado con $1,500 pesos, enviamos el comprobante de dep&oacute;sito y te
+                        <h5>Realiza tu apartado con $1,500 pesos, envianos el comprobante de dep&oacute;sito y te
                             enviamos el comprobante de apartado.</h5>
                     </div>
                 </div>
@@ -340,7 +341,7 @@
 
     <!-- gallery section -->
     <section class="gallery-section layout_padding2">
-        <div class="container">
+        <div class="container text-center">
             <h2>
                 Galer&iacute;a
             </h2>
@@ -505,7 +506,7 @@
     <script>
 
         function copiarNumeroTarjeta(numbercard) {
-
+            event.preventDefault();
             /* Crea un elemento de texto temporal */
             var elementoTemporal = document.createElement("textarea");
             elementoTemporal.value = numbercard;
@@ -521,28 +522,12 @@
             document.body.removeChild(elementoTemporal);
 
             /* Muestra un mensaje de éxito (puedes personalizarlo según tus necesidades) */
-            alert("Valor copiado al portapapeles: " + numbercard);
+            // alert("Valor copiado al portapapeles: " + numbercard);
         }
 
-        function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 11,
-                center: {
-                    lat: 40.645037,
-                    lng: -73.880224
-                },
-            });
 
-            var image = 'images/maps-and-flags.png';
-            var beachMarker = new google.maps.Marker({
-                position: {
-                    lat: 40.645037,
-                    lng: -73.880224
-                },
-                map: map,
-                icon: image
-            });
-        }
+
+
     </script>
     <!-- google map js -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8eaHt9Dh5H57Zh0xVTqxVdBFCvFMqFjQ&callback=initMap">
