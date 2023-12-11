@@ -604,39 +604,35 @@ a:focus {
 
 
 
-.section-gallery{
+.section-gallery {
   display: flex;
   width: 100%;
   height: 700px;
 }
 
-.section-gallery  img{
-width: 0px;
-flex-grow: 1;
-object-fit: cover;
-opacity: 0.8;
-transition: .5s ease;
+.section-gallery img {
+  width: 0px;
+  flex-grow: 1;
+  object-fit: cover;
+  opacity: 0.8;
+  transition: .5s ease;
 }
 
-.section-gallery img:hover{
-  cursor: crosshair;
+.section-gallery img:hover {
   width: 10%;
   opacity: 1;
   filter: contrast(120%)
 }
 
-
-
-@media only screen and (max-width : 1080px) {
+/* @media only screen and (max-width : 1080px) {
   .img-entregas {
     width: 100% !important;
     height: auto !important;
   }
 
-    .section-gallery img:hover {
-      cursor: crosshair;
-      width: 40%;
-      opacity: 1;
-      filter: contrast(120%)
-    }
-}
+  .section-gallery img:hover {
+    width: 70%;
+    opacity: 1;
+    filter: contrast(120%)
+  }
+} */
