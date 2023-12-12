@@ -176,8 +176,12 @@ a:focus {
 }
 
 .slider_detail-box h1 {
-  color: #ffffff;
+  color: #007EBD;
   font-size: 52px;
+}
+
+.slider_detail-box h1 span {
+  color: #007EBD;
 }
 
 .slider_detail-box h1 span {
@@ -236,7 +240,7 @@ a:focus {
   height: 20px;
   border-radius: 100%;
   opacity: 1;
-  background-color: white;
+  background-color: #FFC534;
 }
 
 .carousel-indicators .active {
