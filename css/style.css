@@ -628,6 +628,18 @@ a:focus {
   filter: contrast(120%)
 }
 
+.label_blue {
+  color: #00A2CA;
+}
+
+.label_rose {
+  color: #EF36A9;
+}
+
+.label_red {
+  color: #f30976;
+}
+
 /* @media only screen and (max-width : 1080px) {
   .img-entregas {
     width: 100% !important;
