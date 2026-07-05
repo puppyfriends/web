@@ -3,212 +3,558 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Navegación OpenStreetMap</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         html,
         body {
-            margin: 0;
             height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         #map {
             width: 100%;
             height: 100%;
+            background: #e8e8e8;
         }
 
-        .info {
+        /* Panel de control moderno */
+        .control-panel {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 20px;
+            left: 20px;
             z-index: 1000;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-            background: white;
-            padding: 12px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, .3);
-            font-family: Arial;
+        .control-panel:hover {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
         }
 
-        .info button {
-            margin: 3px;
-            padding: 8px 12px;
+        .panel-header {
+            padding: 20px 24px 16px 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .panel-header h5 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-header h5 i {
+            color: #4a6cf7;
+            font-size: 1.3rem;
+        }
+
+        .panel-body {
+            padding: 20px 24px 24px 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: #f8f9fc;
+            border-radius: 10px;
+            padding: 12px 14px;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: background 0.2s ease;
+        }
+
+        .info-card:hover {
+            background: #f0f2f7;
+        }
+
+        .info-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .info-card .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            display: block;
+        }
+
+        .info-card .value i {
+            font-size: 0.9rem;
+            color: #4a6cf7;
+            margin-right: 4px;
+        }
+
+        .btn-group-vertical-custom {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-custom {
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
             border: none;
-            border-radius: 6px;
-            background: #1976D2;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
         }
 
-        .info button:hover {
-            background: #1565C0;
+        .btn-custom i {
+            font-size: 1.1rem;
+        }
+
+        .btn-primary-custom {
+            background: #4a6cf7;
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            background: #3a5cdb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 108, 247, 0.35);
+        }
+
+        .btn-success-custom {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success-custom:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-secondary-custom {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(107, 114, 128, 0.35);
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            color: #4a6cf7;
+            border: 2px solid #4a6cf7;
+        }
+
+        .btn-outline-custom:hover {
+            background: #4a6cf7;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 108, 247, 0.25);
+        }
+
+        .status-badge {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            display: inline-block;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .control-panel {
+                width: calc(100% - 32px);
+                top: 16px;
+                left: 16px;
+                max-width: 360px;
+            }
+
+            .panel-body {
+                padding: 16px 20px 20px 20px;
+            }
+
+            .info-grid {
+                gap: 8px;
+            }
+
+            .info-card .value {
+                font-size: 1rem;
+            }
+
+            .status-badge {
+                font-size: 0.65rem;
+                padding: 6px 14px;
+                bottom: 16px;
+            }
+        }
+
+        /* Leaflet custom markers */
+        .leaflet-popup-content-wrapper {
+            border-radius: 10px !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .leaflet-popup-content {
+            font-weight: 500;
+        }
+
+        .leaflet-control-zoom {
+            border: none !important;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .leaflet-control-zoom a {
+            background: white !important;
+            color: #1a1a2e !important;
+            font-weight: 600 !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background: #f0f2f7 !important;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="card shadow position-absolute top-0 start-0 m-3" style="z-index:1000; width:260px;">
-        <div class="card-body">
-
-            <h5 class="card-title">🧭 Navegación</h5>
-
-            <p class="mb-1">
-                <strong>Distancia:</strong>
-                <span id="distancia">-</span>
-            </p>
-
-            <p class="mb-3">
-                <strong>Tiempo:</strong>
-                <span id="tiempo">-</span>
-            </p>
-
-            <div class="d-grid gap-2">
-
-                <button class="btn btn-primary" onclick="miUbicacion()">
-                    📍 Mi ubicación
-                </button>
-
-                <button class="btn btn-success" onclick="irAlDestino()">
-                    🎯 Ir al destino
-                </button>
-
-                <button class="btn btn-secondary" onclick="verRuta()">
-                    🛣️ Ver ruta
-                </button>
-
+    <!-- Panel de Control Mejorado -->
+    <div class="control-panel">
+        <div class="panel-header">
+            <h5>
+                <i class="bi bi-compass-fill"></i>
+                Navegación
+                <span style="font-size: 0.7rem; font-weight: 400; color: #6b7280; margin-left: auto;">OSRM</span>
+            </h5>
+        </div>
+        <div class="panel-body">
+            <!-- Grid de información -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <span class="label">Distancia</span>
+                    <span class="value" id="distancia">
+                        <i class="bi bi-arrow-right"></i> -
+                    </span>
+                </div>
+                <div class="info-card">
+                    <span class="label">Tiempo estimado</span>
+                    <span class="value" id="tiempo">
+                        <i class="bi bi-clock"></i> -
+                    </span>
+                </div>
             </div>
 
+            <!-- Botones -->
+            <div class="btn-group-vertical-custom">
+                <button class="btn-custom btn-primary-custom" onclick="miUbicacion()">
+                    <i class="bi bi-geo-alt-fill"></i> Mi ubicación
+                </button>
+                <button class="btn-custom btn-success-custom" onclick="irAlDestino()">
+                    <i class="bi bi-flag-fill"></i> Ir al destino
+                </button>
+                <button class="btn-custom btn-secondary-custom" onclick="verRuta()">
+                    <i class="bi bi-map-fill"></i> Ver ruta completa
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Mapa -->
     <div id="map"></div>
 
+    <!-- Badge de estado -->
+    <div class="status-badge">
+        <span class="dot"></span>
+        <span>GPS activo</span>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-
+        // Destino fijo
         const destino = {
             lat: 20.908630989255528,
             lng: -89.5946892597742
         };
 
-        const map = L.map('map').setView([destino.lat, destino.lng], 15);
+        // Inicializar mapa
+        const map = L.map('map', {
+            zoomControl: true,
+            fadeAnimation: true,
+            zoomAnimation: true,
+        }).setView([destino.lat, destino.lng], 15);
 
+        // Capa OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
+            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19,
         }).addTo(map);
 
-        L.marker([destino.lat, destino.lng])
+        // Marcador de destino con ícono personalizado
+        const destinoIcon = L.divIcon({
+            html: '<i class="bi bi-geo-alt-fill" style="font-size: 2rem; color: #ef4444; filter: drop-shadow(0 2px 8px rgba(239,68,68,0.4));"></i>',
+            className: '',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+        });
+
+        L.marker([destino.lat, destino.lng], {
+            icon: destinoIcon,
+            alt: 'Destino'
+        })
             .addTo(map)
-            .bindPopup("Destino");
+            .bindPopup('<strong>📍 Destino</strong><br>Ubicación seleccionada')
+            .openPopup();
 
-        let marcadorUsuario;
-        let ruta;
+        // Variables de control
+        let marcadorUsuario = null;
+        let ruta = null;
+        let userCircle = null;
 
+        // Función para actualizar la ruta
         function actualizarRuta(lat, lng) {
+            const url =
+                `https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
 
-            fetch(`https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`)
-                .then(r => r.json())
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error en la solicitud');
+                    return response.json();
+                })
                 .then(data => {
-
-                    if (ruta) {
-                        map.removeLayer(ruta);
+                    if (!data.routes || data.routes.length === 0) {
+                        document.getElementById("distancia").innerHTML = '<i class="bi bi-exclamation-triangle"></i> No disponible';
+                        document.getElementById("tiempo").innerHTML = '<i class="bi bi-exclamation-triangle"></i> No disponible';
+                        return;
                     }
 
-                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                    // Remover ruta anterior
+                    if (ruta) {
+                        map.removeLayer(ruta);
+                        ruta = null;
+                    }
 
+                    // Crear nueva ruta
+                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
                     ruta = L.polyline(coords, {
-                        color: 'blue',
-                        weight: 6
+                        color: '#4a6cf7',
+                        weight: 5,
+                        opacity: 0.9,
+                        smoothFactor: 1.5,
+                        lineJoin: 'round',
+                        lineCap: 'round',
                     }).addTo(map);
 
-                    map.fitBounds(ruta.getBounds());
+                    // Agregar marcadores de inicio y fin en la ruta
+                    const startIcon = L.divIcon({
+                        html: '<i class="bi bi-circle-fill" style="font-size: 1rem; color: #10b981;"></i>',
+                        className: '',
+                        iconSize: [12, 12],
+                    });
+
+                    const endIcon = L.divIcon({
+                        html: '<i class="bi bi-circle-fill" style="font-size: 1rem; color: #ef4444;"></i>',
+                        className: '',
+                        iconSize: [12, 12],
+                    });
+
+                    // Actualizar información
+                    const distancia = (data.routes[0].distance / 1000).toFixed(2);
+                    const duracion = Math.round(data.routes[0].duration / 60);
 
                     document.getElementById("distancia").innerHTML =
-                        (data.routes[0].distance / 1000).toFixed(2) + " km";
+                        `<i class="bi bi-arrow-right"></i> ${distancia} km`;
 
                     document.getElementById("tiempo").innerHTML =
-                        Math.round(data.routes[0].duration / 60) + " min";
+                        `<i class="bi bi-clock"></i> ${duracion} min`;
 
+                })
+                .catch(error => {
+                    console.error('Error al obtener la ruta:', error);
+                    document.getElementById("distancia").innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error';
+                    document.getElementById("tiempo").innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error';
                 });
-
         }
+
+        // Función: Mi ubicación
         function miUbicacion() {
             if (marcadorUsuario) {
-                map.flyTo(marcadorUsuario.getLatLng(), 18, {
+                const latLng = marcadorUsuario.getLatLng();
+                map.flyTo([latLng.lat, latLng.lng], 17, {
                     animate: true,
-                    duration: 1.5
+                    duration: 1.5,
+                    easeLinearity: 0.5,
                 });
+            } else {
+                alert('No se ha detectado tu ubicación aún. Espera un momento.');
             }
         }
 
+        // Función: Ir al destino
         function irAlDestino() {
-            map.flyTo([destino.lat, destino.lng], 18, {
+            map.flyTo([destino.lat, destino.lng], 17, {
                 animate: true,
-                duration: 1.5
+                duration: 1.5,
+                easeLinearity: 0.5,
             });
         }
 
+        // Función: Ver ruta completa
         function verRuta() {
             if (ruta) {
                 map.fitBounds(ruta.getBounds(), {
-                    padding: [50, 50]
+                    padding: [60, 60],
+                    maxZoom: 16,
+                    animate: true,
+                    duration: 1.2,
                 });
+            } else {
+                alert('No hay una ruta calculada. Espera a que se detecte tu ubicación.');
             }
         }
 
+        // Geolocalización con watchPosition
         if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
 
-            navigator.geolocation.watchPosition(pos => {
+                    // Crear o actualizar marcador de usuario
+                    if (!marcadorUsuario) {
+                        const userIcon = L.divIcon({
+                            html: '<i class="bi bi-person-circle" style="font-size: 2.2rem; color: #4a6cf7; filter: drop-shadow(0 2px 8px rgba(74,108,247,0.4));"></i>',
+                            className: '',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30],
+                        });
 
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
+                        marcadorUsuario = L.marker([lat, lng], {
+                            icon: userIcon,
+                            alt: 'Tu ubicación'
+                        }).addTo(map)
+                            .bindPopup('<strong>👤 Tú estás aquí</strong>')
+                            .openPopup();
 
-                if (!marcadorUsuario) {
+                        // Círculo de precisión
+                        userCircle = L.circle([lat, lng], {
+                            radius: 20,
+                            color: '#4a6cf7',
+                            fillColor: '#4a6cf7',
+                            fillOpacity: 0.1,
+                            weight: 2,
+                            opacity: 0.4,
+                        }).addTo(map);
 
-                    marcadorUsuario = L.marker([lat, lng]).addTo(map)
-                        .bindPopup("Tu ubicación");
+                    } else {
+                        marcadorUsuario.setLatLng([lat, lng]);
+                        if (userCircle) {
+                            userCircle.setLatLng([lat, lng]);
+                        }
+                    }
 
-                } else {
+                    // Actualizar ruta
+                    actualizarRuta(lat, lng);
 
-                    marcadorUsuario.setLatLng([lat, lng]);
-
-                }
-
-                actualizarRuta(lat, lng);
-
-            },
-                err => {
-                    alert("No fue posible obtener la ubicación.");
+                    // Primera vez: centrar el mapa
+                    if (!map._initialized) {
+                        map.setView([lat, lng], 15);
+                        map._initialized = true;
+                    }
                 },
-                {
-                    enableHighAccuracy: true,
-                    maximumAge: 0
-                });
-
+                (err) => {
+                    console.warn('Error de geolocalización:', err);
+                    let msg = 'No fue posible obtener tu ubicación.';
+                    if (err.code === 1) msg = 'Permiso denegado para acceder a la ubicación.';
+                    if (err.code === 2) msg = 'Señal de GPS no disponible.';
+                    if (err.code === 3) msg = 'Tiempo de espera agotado.';
+                    alert(msg + ' Usando ubicación predeterminada.');
+                }, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000,
+            }
+            );
         } else {
-
-            alert("Tu navegador no soporta geolocalización.");
-
+            alert('Tu navegador no soporta geolocalización. Usando ubicación predeterminada.');
         }
 
+        // Agregar control de zoom personalizado
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>
