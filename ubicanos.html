@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Navegación OpenStreetMap</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="info">
+        <b>Navegación</b><br>
+        Distancia: <span id="distancia">-</span><br>
+        Tiempo: <span id="tiempo">-</span>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+
+        const destino = {
+            lat: 20.908630989255528,
+            lng: -89.5946892597742
+        };
+
+        const map = L.map('map').setView([destino.lat, destino.lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        L.marker([destino.lat, destino.lng])
+            .addTo(map)
+            .bindPopup("Destino");
+
+        let marcadorUsuario;
+        let ruta;
+
+        function actualizarRuta(lat, lng) {
+
+            fetch(`https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`)
+                .then(r => r.json())
+                .then(data => {
+
+                    if (ruta) {
+                        map.removeLayer(ruta);
+                    }
+
+                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+
+                    ruta = L.polyline(coords, {
+                        color: 'blue',
+                        weight: 6
+                    }).addTo(map);
+
+                    map.fitBounds(ruta.getBounds());
+
+                    document.getElementById("distancia").innerHTML =
+                        (data.routes[0].distance / 1000).toFixed(2) + " km";
+
+                    document.getElementById("tiempo").innerHTML =
+                        Math.round(data.routes[0].duration / 60) + " min";
+
+                });
+
+        }
+
+        if (navigator.geolocation) {
+
+            navigator.geolocation.watchPosition(pos => {
+
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                if (!marcadorUsuario) {
+
+                    marcadorUsuario = L.marker([lat, lng]).addTo(map)
+                        .bindPopup("Tu ubicación");
+
+                } else {
+
+                    marcadorUsuario.setLatLng([lat, lng]);
+
+                }
+
+                actualizarRuta(lat, lng);
+
+            },
+                err => {
+                    alert("No fue posible obtener la ubicación.");
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0
+                });
+
+        } else {
+
+            alert("Tu navegador no soporta geolocalización.");
+
+        }
+
+    </script>
+
+</body>
+
+</html>
