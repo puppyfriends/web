@@ -291,8 +291,8 @@
         <div class="panel-header">
             <h5>
                 <i class="bi bi-compass-fill"></i>
-                Navegación
-                <span style="font-size: 0.7rem; font-weight: 400; color: #6b7280; margin-left: auto;">OSRM</span>
+                PUPPY FRIENDS
+                <span style="font-size: 0.7rem; font-weight: 400; color: #6b7280; margin-left: auto;"></span>
             </h5>
         </div>
         <div class="panel-body">
@@ -312,18 +312,18 @@
                 </div>
             </div>
 
-            <!-- Botones -->
-            <div class="btn-group-vertical-custom">
-                <button class="btn-custom btn-primary-custom" onclick="miUbicacion()">
-                    <i class="bi bi-geo-alt-fill"></i> Mi ubicación
-                </button>
-                <button class="btn-custom btn-success-custom" onclick="irAlDestino()">
-                    <i class="bi bi-flag-fill"></i> Ir al destino
-                </button>
-                <button class="btn-custom btn-secondary-custom" onclick="verRuta()">
-                    <i class="bi bi-map-fill"></i> Ver ruta completa
-                </button>
-            </div>
+        <!-- Botones en una misma fila con Bootstrap -->
+        <div class="d-flex gap-2">
+            <button class="btn-custom btn-primary-custom flex-fill" onclick="miUbicacion()">
+                <i class="bi bi-geo-alt-fill"></i>
+            </button>
+            <button class="btn-custom btn-success-custom flex-fill" onclick="irAlDestino()">
+                <i class="bi bi-flag-fill"></i>
+            </button>
+            <button class="btn-custom btn-secondary-custom flex-fill" onclick="verRuta()">
+                <i class="bi bi-map-fill"></i>
+            </button>
+        </div>
         </div>
     </div>
 
